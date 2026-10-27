@@ -324,8 +324,11 @@ class Installer:
                 temp_path = None
                 with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sh") as temp_file:
                     temp_file.write(c['cmd'])
+                    # Capture return node so 'rm' isn't the script's exit status
+                    temp_file.write("\nRET=$?\n")
                     # Have script's last line remove the script from container
                     temp_file.write("\nrm -- \"$0\"\n")
+                    temp_file.write("\nexit $RET\n")
                     temp_path = temp_file.name
                 args.append(temp_path)
                 copy = [{'src': temp_path, 'dest': temp_path}]
